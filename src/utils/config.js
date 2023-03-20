@@ -1,3 +1,3 @@
 export default { 
-  SERVER_URL: process.env.REACT_APP_BASE_URL, 
+  SERVER_URL: "http://localhost:5000", 
 } 

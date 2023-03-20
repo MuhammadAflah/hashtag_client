@@ -21,7 +21,7 @@ const ChatItem = ({ chat }) => {
     const getUser = async () => {
       try {
         const res = await axios.get(
-          `${process.env.REACT_APP_BASE_URL}/users/${friendId}`,
+          `http://localhost:5000/users/${friendId}`,
           {
             headers: {
               "Content-Type": "multipart/form-data",

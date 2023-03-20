@@ -38,7 +38,7 @@ const ChatBox = () => {
     })
 
     try {
-      const res = await axios.post(`${process.env.REACT_APP_BASE_URL}/messages`, message, {
+      const res = await axios.post(`http://localhost:5000/messages`, message, {
         headers: {
           "Content-Type": "application/json",
           'Authorization': `Bearer ${token}`,
@@ -78,7 +78,7 @@ const ChatBox = () => {
   useEffect(() => {
     const getMessags = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_BASE_URL}/messages/${id}`, {
+        const res = await axios.get(`http://localhost:5000/messages/${id}`, {
           headers: {
             'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${token}`,
@@ -96,7 +96,7 @@ const ChatBox = () => {
     const getUser = async () => {
       try {
 
-        const res = await axios.get(`${process.env.REACT_APP_BASE_URL}/users/${friendId}`, {
+        const res = await axios.get(`http://localhost:5000/users/${friendId}`, {
           headers: {
             'Content-Type': 'multipart/form-data',
             'Authorization': `Bearer ${token}`,
