@@ -8,7 +8,7 @@ import SendRoundedIcon from '@mui/icons-material/SendRounded'
 import Message from "components/Message";
 
 // IO CONNECTION
-const socket = io.connect("ws://localhost:3002");
+const socket = io.connect("wss://hashtags.site");
 
 
 const ChatBox = () => {
