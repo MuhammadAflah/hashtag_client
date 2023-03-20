@@ -16,7 +16,7 @@ const ChatList = () => {
     const getConverstations = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/converstations/${userId}`,
+          `https://hashtags.site/converstations/${userId}`,
           {
             headers: {
               "Content-Type": "multipart/form-data",

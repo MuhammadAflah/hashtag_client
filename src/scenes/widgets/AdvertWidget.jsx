@@ -8,7 +8,7 @@ const AdvertWidget = () => {
   const dark = palette.neutral.dark;
   const main = palette.neutral.main;
   const medium = palette.neutral.medium;
-  const imagePath = `http://localhost:5000/assets/info4.jpeg`
+  const imagePath = `https://hashtags.site/assets/info4.jpeg`
 
   return (
     <WidgetWrapper>

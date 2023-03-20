@@ -21,7 +21,7 @@ const ChatItem = ({ chat }) => {
     const getUser = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/users/${friendId}`,
+          `https://hashtags.site/users/${friendId}`,
           {
             headers: {
               "Content-Type": "multipart/form-data",

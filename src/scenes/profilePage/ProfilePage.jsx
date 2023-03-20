@@ -51,7 +51,7 @@ const ProfilePage = () => {
   };
 
   const createConverStation = async (friendId) => {
-    const { data } = await axios.post(`http://localhost:5000/converstations`, { friendId }, {
+    const { data } = await axios.post(`https://hashtags.site/converstations`, { friendId }, {
       headers: {
         "Content-Type": "application/json",
         'Authorization': `Bearer ${token}`,
