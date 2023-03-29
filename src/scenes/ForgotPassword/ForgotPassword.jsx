@@ -1,6 +1,7 @@
 import { useTheme } from "@emotion/react";
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import WidgetWrapper from "components/WidgetWrapper";
+import { MDBCard, MDBCardBody, MDBCardImage, MDBCol, MDBContainer, MDBIcon, MDBRow } from "mdb-react-ui-kit";
 import { useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import { Link } from "react-router-dom";
@@ -42,88 +43,54 @@ export const ForgotPassword = () => {
 
   return !isVerified ? (
     <form>
-      <Box>
-        <Box
-          width="100%"
-          backgroundColor={theme?.palette?.background?.alt}
-          p="1rem 6%"
-          textAlign="center"
-        >
-          <Typography fontWeight="bold" fontSize="32px" color="primary">
-          HashTags
-          </Typography>
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "85vh",
-          }}
-        >
-          <WidgetWrapper>
-            <Box p="1rem" sx={{ width: "30rem", alignItems: "center" }}>
-              <Typography
-                variant="h4"
-                //   color={}
-                fontWeight="500"
-                mb="1rem"
-                sx={{ display: "flex", alignItems: "center" }}
-              >
-                {/* <EditOutlined sx={{ mr: "0.5rem" }} /> */}
-                Enter Your Email
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    name="email"
-                    label="Enter new email"
-                    type="email"
-                    onChange={(e) => setEmail(e.target.value)}
-                    margin="normal"
-                    variant="outlined"
-                    fullWidth
-                  />
-                </Grid>
-              </Grid>
-              <Box
-                display="flex"
-                justifyContent="flex-end"
-                mt="1rem"
-                sx={{
-                  button: {
-                    margin: "0 0.5rem",
-                  },
-                  "& button:first-of-type": {
-                    marginRight: 0,
-                  },
-                }}
-              >
-                <Button
-                  onClick={handleClick}
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                >
-                  Send
-                </Button>
-                <Link to="/" style={{ textDecoration: "none" }}>
-                  <Button
-                    sx={{ marginTop: "10px" }}
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                  >
-                    Back to login page
-                  </Button>
-                </Link>
-              </Box>
-            </Box>
-          </WidgetWrapper>
-        </Box>
-      </Box>
-      <Toaster />
-    </form>
+    <MDBContainer className="my-5 main">
+
+            <MDBCard>
+              <MDBRow className='g-0 body'>
+
+                <MDBCol md='6'>
+                  <MDBCardImage src='https://cdn.mos.cms.futurecdn.net/pk2A58d5MnYCSGKAi2mGVS-1200-80.jpg' alt="login form" className='p-5 img-fluid' style={{ objectFit: "cover", height: "100%", width: "100%", display: "inlineblock" }} />
+                </MDBCol>
+
+                <MDBCol md='6'>
+                  <MDBCardBody className='d-flex flex-column mt-5 d-flex align-items-centeryy'>
+
+                    <div className='d-flex flex-row mt-2'>
+                      <MDBIcon fas icon="fa-doutone fa-hashtag fa-3x me-3" style={{ color: '#ff6219' }} />
+
+                      <span className="h1 fw-bold mb-0">HashTag</span>
+                    </div>
+                    {/* { message ? <p style={{color:"green", fontWeight:"bold"}}>Passowrd updated successfully</p> : ""} */}
+
+                    <h5 className="fw-normal my-4 pb-3" style={{ letterSpacing: '1px' }}>Enter your New Password</h5>
+                    <Box>
+                      <TextField
+                        name="email"
+                        label="Enter your email"
+                        type="email"
+                        onChange={(e) => setEmail(e.target.value)}
+                        margin="normal"
+                        variant="outlined"
+                        fullWidth
+                        
+                      />
+                      
+                      <Button onClick={handleClick} type="submit" variant="contained" color="primary" fullWidth>
+                        Send
+                      </Button>
+                      <Link to="/">
+                      <Button sx={{marginTop:"10px"}}  type="submit" variant="contained" color="primary" fullWidth>
+                        Back to login page
+                      </Button>
+                      </Link>
+                    </Box>
+                  </MDBCardBody>
+                </MDBCol>
+              </MDBRow>
+            </MDBCard>
+          </MDBContainer>
+          <Toaster />
+        </form>
   ) : (
     <div
       style={{

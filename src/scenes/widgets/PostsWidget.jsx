@@ -12,8 +12,6 @@ const PostsWidget = ({ userId, isProfile = false }) => {
   const dispatch = useDispatch();
   const posts = useSelector((state) => state?.posts);
   const token = useSelector((state) => state?.token);
-  // const _id = useParams();
-  // const id = _id.userId;
 
   const getPosts = async () => {
     try {
@@ -44,6 +42,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
   // Only render posts if there are posts to display
   return (
     <>
+    
       {posts?.length > 0 ? (
         posts?.map(
           ({
@@ -55,11 +54,12 @@ const PostsWidget = ({ userId, isProfile = false }) => {
             comments,
             createdAt,
           }) => (
+            
             <PostWidget
               key={_id}
               postId={_id}
               postUserId={author?._id}
-              name={`${author?.firstName} ${author?.lastName}`}
+              name={author?.username}
               description={content}
               picturePath={image}
               userPicturePath={author?.picturePath}
@@ -67,8 +67,11 @@ const PostsWidget = ({ userId, isProfile = false }) => {
               comments={comments}
               createdAt={createdAt}
               isProfile
+              
             />
+            
           )
+          
         )
       ) : (
         <WidgetWrapper m="2rem 0">
@@ -82,6 +85,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
           </Box>
         </WidgetWrapper>
       )}
+
     </>
   );
 };

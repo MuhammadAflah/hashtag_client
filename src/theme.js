@@ -26,6 +26,7 @@ export const colorTokens = {
     700: "#006B7D",
     800: "#00353F",
     900: "#001519",
+    1000: "#212529"
   },
 };
 
@@ -56,8 +57,8 @@ export const themeSettings = (mode) => {
         : {
             primary: {
               dark: colorTokens.primary[700],
-              main: colorTokens.primary[500],
-              light: colorTokens.primary[50],
+              main: colorTokens.primary[1000],
+              light: colorTokens.primary[500],
             },
             neutral: {
               dark: colorTokens.grey[700],

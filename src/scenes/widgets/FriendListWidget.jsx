@@ -68,7 +68,7 @@ const FriendListWidget = ({ userId, isSuggestion }) => {
               <Friend
                 key={friend._id}
                 friendId={friend._id}
-                name={`${friend.firstName} ${friend.lastName}`}
+                name={friend?.username}
                 subtitle={friend.occupation}
                 userPicturePath={friend.picturePath}
                 isFriendData
@@ -84,7 +84,7 @@ const FriendListWidget = ({ userId, isSuggestion }) => {
             <Friend
               key={friend?._id + I}
               friendId={friend?._id}
-              name={`${friend?.firstName} ${friend?.lastName}`}
+              name={friend?.username}
               subtitle={friend?.occupation}
               userPicturePath={friend?.picturePath}
               isFriendData

@@ -6,6 +6,8 @@ import { useSelector } from "react-redux";
 import io from 'socket.io-client';
 import SendRoundedIcon from '@mui/icons-material/SendRounded'
 import Message from "components/Message";
+import SendIcon from "@mui/icons-material/Send";
+import { useTheme } from "@emotion/react";
 
 // IO CONNECTION
 const socket = io.connect("wss://hashtags.site");
@@ -20,8 +22,13 @@ const ChatBox = () => {
   const userId = useSelector((state) => state?.user?._id);
   const token = useSelector((state) => state?.token);
   const scrollRef = useRef();
-  const id = useSelector((state) => state?.ids?.chatId)
-  const friendId = useSelector((state) => state?.ids?.friendId)
+  const { palette } = useTheme();
+  const id = useSelector((state) => state?.ids?.chatId);
+  const friendId = useSelector((state) => state?.ids?.friendId);
+  let messages1 = []
+  if(messages){
+    messages1=messages
+  }
 
 
   const handleSubmit = async (e) => {
@@ -45,7 +52,7 @@ const ChatBox = () => {
         },
       })
 
-      setMessages([...messages, res.data]);
+      setMessages([...messages1, res.data]);
       setNewMessage('');
     } catch (error) {
       console.log(error)
@@ -70,9 +77,7 @@ const ChatBox = () => {
 
   useEffect(() => {
     socket.emit('addUser', userId)
-    socket.on('getUsers', users => {
-
-    })
+    socket.on('getUsers', (users) => {})
   }, [userId])
 
   useEffect(() => {
@@ -114,7 +119,7 @@ const ChatBox = () => {
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+  }, [messages1])
 
 
   return (
@@ -122,7 +127,7 @@ const ChatBox = () => {
       <Box flex={4}>
         <Box
           sx={{
-            height: "90vh",
+            height: "70vh",
             width: "99%",
             border: "none",
           }}
@@ -134,7 +139,7 @@ const ChatBox = () => {
                 {/* <MoreVertIcon /> */}
               </IconButton>
             }
-            title={friend?.firstName}
+            title={friend?.username}
             subheader="online"
           />
           <Box
@@ -149,8 +154,8 @@ const ChatBox = () => {
             }}
           >
             <Box>
-              {messages &&
-                messages.map((msg, index) => {
+              {messages1 &&
+                messages1?.map((msg, index) => {
                   return (
                     <Box ref={scrollRef} key={index}>
                       <Message msg={msg} />
@@ -167,9 +172,9 @@ const ChatBox = () => {
           >
             <Box
               sx={{
-                // marginLeft: "3rem",
-                height: "4rem",
-                width: "100%",
+                marginLeft: "3rem",
+                height: "3rem",
+                width: "90%",
                 display: "flex",
                 paddingLeft: "1rem",
               }}
@@ -179,7 +184,6 @@ const ChatBox = () => {
                   padding: "1rem",
                   backgroundColor: "white",
                   borderRadius: "20px",
-                  marginBottom: "1rem"
                 }}
                 placeholder="Type here"
                 multiline
@@ -189,35 +193,25 @@ const ChatBox = () => {
                 inputProps={{ "aria-label": "Type Message" }}
               />
             </Box>
-            {/* <SendRoundedIcon
-              onClick={handleSubmit}
+            <IconButton
               sx={{
-                backgroundColor: "#bc80d4",
-                padding: "1rem",
-                paddingLeft: "1rem",
-                borderRadius: "100%",
-                color: "white",
-                marginInline: "1rem",
-                cursor: "pointer",
+                backgroundColor: palette?.primary?.main,
                 "&:hover": {
-                  backgroundColor: "green",
-                  color: "black",
+                  backgroundColor: palette?.neutral?.medium,
+                  color: palette?.neutral?.medium,
                 },
               }}
-            /> */}
-            <Button onClick={handleSubmit} variant="contained"
-            sx={{
-              borderRadius: "30%",
-              cursor: "pointer",
-              height: "3rem",
-              margin:"3px",
-              "&:hover":{
-                backgroundColor:"green",
-                color:"black"
-              }
-            }}
-            >Send</Button>
-
+            >
+              <SendIcon
+                onClick={handleSubmit}
+                sx={{
+                  borderRadius: "100%",
+                  color: palette?.background?.alt,
+                  marginInline: "0.5rem",
+                  cursor: "pointer",
+                }}
+              />
+            </IconButton>
           </Box>
         </Box>
       </Box>

@@ -8,6 +8,7 @@ import {
   setFollowings,
   setPosts,
   setSuggestions,
+  setUserData,
 } from "state/authSlice";
 import { deleteDataAPI, patchDataAPI } from "utils/fetchData";
 import FlexBetween from "./FlexBetween";
@@ -20,10 +21,12 @@ const Friend = ({
   userPicturePath,
   postId,
   isFriendData,
+  userImage=true,
 }) => {
+  console.log(name,"frid");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { _id } = useSelector((state) => state?.user);
+  const _id  = useSelector((state) => state?.user?._id);
   const token = useSelector((state) => state?.token);
   const followings = useSelector((state) => state?.user?.followings);
   const followers = useSelector((state) => state?.user?.followers);
@@ -42,26 +45,6 @@ const Friend = ({
         {},
         token
       );
-
-      // const formattedFollowingsData = data.formattedFollowings.map(
-      //   ({ id }) => id
-      // );
-      // const formattedFollowersData = data.formattedFollowers.map(
-      //   ({ id }) => id
-      // );
-
-      // if (isEqual(formattedFollowingsData, formattedFollowersData)) {
-      //   dispatch(setFollowings({ followings: data.formattedFollowings }));
-      //   dispatch(setFollowers({ followers: [] }));
-      //   dispatch(setSuggestions({ suggestions: data.suggestions }));
-
-      // } else {
-      //   dispatch(setFollowings({ followings: data.formattedFollowings }));
-      //   dispatch(setFollowers({ followers: data.formattedFollowers }));
-      //   dispatch(setSuggestions({ suggestions: data.suggestions }));
-
-      // }
-
       dispatch(setFollowings({ followings: data?.formattedFollowings }));
       dispatch(setFollowers({ followers: data?.formattedFollowers }));
       // dispatch(setSuggestions({ suggestions: data.suggestions }));
@@ -76,25 +59,6 @@ const Friend = ({
         {},
         token
       );
-
-      // const formattedFollowingsData = data.formattedFollowings.map(
-      //   ({ id }) => id
-      // );
-      // const formattedFollowersData = data.formattedFollowers.map(
-      //   ({ id }) => id
-      // );
-
-      // if (isEqual(formattedFollowingsData, formattedFollowersData)) {
-      //   dispatch(setFollowings({ followings: data.formattedFollowings }));
-      //   dispatch(setFollowers({ followers: [] }));
-      //   dispatch(setSuggestions({ suggestions: data.suggestions }));
-
-      // } else {
-      //   dispatch(setFollowings({ followings: data.formattedFollowings }));
-      //   dispatch(setFollowers({ followers: data.formattedFollowers }));
-      //   dispatch(setSuggestions({ suggestions: data.suggestions }));
-
-      // }
 
       dispatch(setFollowings({ followings: data?.formattedFollowings }));
       dispatch(setFollowers({ followers: data?.formattedFollowers }));
@@ -127,7 +91,7 @@ const Friend = ({
   return (
     <FlexBetween>
       <FlexBetween gap="1rem">
-        <UserImage image={userPicturePath} size="55px" />
+        {userImage && <UserImage image={userPicturePath} size="55px" />}
         <Box
           onClick={() => {
             navigate(`/profile/${friendId}`);
@@ -163,15 +127,15 @@ const Friend = ({
           theme={"snow"}
         >
           <Tooltip title="Delete">
-            <IconButton sx={{  p: "0.6rem" }}>
-              <Delete />
-            </IconButton>
-          </Tooltip>
+             <IconButton sx={{  p: "0.6rem" }}>
+               <Delete />
+             </IconButton>
+           </Tooltip>
         </ConfirmToast>
       ) : (
         <Box>
           {isFollowing ? (
-            <Button onClick={() => unFollowFriend()}>Unfollow</Button>
+            <Button onClick={() => unFollowFriend()}>Following</Button>
           ) : isFollower ? (
             <Button onClick={() => followBackFriend()}>Followback</Button>
           ) : (

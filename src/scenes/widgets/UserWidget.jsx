@@ -1,10 +1,4 @@
-import {
-  ManageAccountsOutlined,
-  EditOutlined,
-  LocationOnOutlined,
-  WorkOutlineOutlined,
-  Chat,
-} from "@mui/icons-material";
+import { ManageAccountsOutlined } from "@mui/icons-material";
 import { Box, Typography, Divider, useTheme, Button } from "@mui/material";
 import UserImage from "components/UserImage";
 import FlexBetween from "components/FlexBetween";
@@ -12,9 +6,9 @@ import WidgetWrapper from "components/WidgetWrapper";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getDataAPI, patchDataAPI } from "utils/fetchData";
+import { getDataAPI, postDataAPI } from "utils/fetchData";
 import { setIsEditing } from "state/authSlice";
-import axios from "axios";
+import Friend from "components/Friend";
 
 const UserWidget = ({
   userId,
@@ -33,26 +27,15 @@ const UserWidget = ({
   const medium = palette?.neutral?.medium;
   const main = palette?.neutral?.main;
   const dispatch = useDispatch();
-  const {userId:friendId} = useParams()
-  
-  const followings = useSelector((state) => state?.user?.followings);
-  const [isFriend,setIsFriend] = useState(followings?.find((friend) => friend?._id === friendId))
-  // console.log(friendId,'kk');
+  const { userId: friendId } = useParams();
 
-  const patchFriend = async () => {
-    try {
-      console.log(friendId,'inside');
-      const { data } = await patchDataAPI(
-        `/users/${user?._id}/${friendId}`,
-        {},
-        token
-      );
-      // dispatch(setFriends({ friends: data }));
-      setIsFriend(!isFriend)
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const createConverStation = async (friendId) => {
+  //   const { data } = await postDataAPI(`/converstations`, { friendId },token );
+
+  //   if (data) {
+  //     navigate(`/message`);
+  //   }
+  // };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,15 +63,9 @@ const UserWidget = ({
   if (!user) {
     return null;
   }
-  const {
-    firstName,
-    lastName,
-    location,
-    occupation,
-  } = user;
+  const { username, name, bio } = user;
   return (
-    <WidgetWrapper
-    >
+    <WidgetWrapper>
       {/* FIRST ROW */}
       <FlexBetween
         gap="0.5rem"
@@ -112,14 +89,8 @@ const UserWidget = ({
                 },
               }}
             >
-              {isFriendData ? friendData?.user?.firstName : firstName}{" "}
-              {isFriendData ? friendData?.user?.lastName : lastName}
+              {isFriendData ? friendData?.user?.username : username}
             </Typography>
-            {isFriendData && (
-              <Box >
-                {isFriend ? <Button onClick={() => patchFriend()}>Unfollow</Button> : <Button onClick={() => patchFriend()}>Follow</Button>}
-              </Box>
-            )}
           </Box>
         </FlexBetween>
         {isEditUser && (
@@ -128,38 +99,62 @@ const UserWidget = ({
             onClick={handleEditClick}
           />
         )}
-      {/* {friendData ? <Chat sx={{ margin: "1rem" }} onClick={() => createConverStation(userId)} variant='contained' size='small' >Message</Chat> : ''} */}
       </FlexBetween>
       <Divider />
       {/* SECOND ROW */}
-      <Box p="1rem 0">
-        <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
-          <LocationOnOutlined fontSize="large" sx={{ color: main }} />
-          <Typography color={medium}>
-            {isFriendData ? friendData?.user?.location : location}
-          </Typography>
-        </Box>
-        <Box display="flex" alignItems="center" gap="1rem">
-          <WorkOutlineOutlined fontSize="large" sx={{ color: main }} />
-          <Typography color={medium}>
-            {isFriendData ? friendData?.user?.occupation : occupation}
-          </Typography>
-        </Box>
-      </Box>
-      <Divider />
+      {isFriendData
+        ? friendData?.user?.name
+        : name && (
+            <>
+              {" "}
+              <Box p="1rem 0">
+                <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
+                  <Typography color={main} fontWeight="500">
+                    {isFriendData ? friendData?.user?.name : name}
+                  </Typography>
+                </Box>
+                <Box display="flex" alignItems="center" gap="1rem">
+                  <Typography color={medium}>
+                    {(isFriendData ? friendData?.user?.bio : bio)
+                      ?.split("\n")
+                      ?.map((line, index) => (
+                        <Box key={index}>
+                          {line}
+                          <br />
+                        </Box>
+                      ))}
+                  </Typography>
+                </Box>
+              </Box>
+              <Divider />
+            </>
+          )}
 
       {/* THIRD ROW */}
       <Box p="1rem 0">
-        <FlexBetween mb="0.5rem">
-          <Typography color={medium}>Following</Typography>
+        <FlexBetween gap="1rem" mb="0.5rem">
+          <FlexBetween gap="1rem">
+            <Box>
+              <Typography color={main} fontWeight="500">
+                Following
+              </Typography>
+            </Box>
+          </FlexBetween>
           <Typography color={main} fontWeight="500">
             {isFriendData
               ? friendData?.followingCount
               : followers?.followingCount}
           </Typography>
         </FlexBetween>
-        <FlexBetween>
-          <Typography color={medium}>Followers</Typography>
+
+        <FlexBetween gap="1rem">
+          <FlexBetween gap="1rem">
+            <Box>
+              <Typography color={main} fontWeight="500">
+                Followers
+              </Typography>
+            </Box>
+          </FlexBetween>
           <Typography color={main} fontWeight="500">
             {isFriendData
               ? friendData?.followersCount
@@ -167,10 +162,12 @@ const UserWidget = ({
           </Typography>
         </FlexBetween>
       </Box>
-
-      <Divider />
-
-      {/* FOURTH ROW */}
+      {isFriendData && (
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          {/* <Button onClick={() => createConverStation(friendId)}>Message</Button> */}
+          <Friend friendId={friendId} userImage={false} />
+        </Box>
+      )}
     </WidgetWrapper>
   );
 };

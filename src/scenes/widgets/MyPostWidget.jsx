@@ -42,7 +42,7 @@ const MyPostWidget = ({ picturePath }) => {
   const postSchema = Yup.object().shape({
     post: Yup.string()
       .required("Comment is required")
-      .matches(/^\S.*$/, "Field must not start with white space"),
+      .matches(/^\S.*$/, "Field must not start with white space"),
   });
 
   const handlePost = async () => {
@@ -180,20 +180,6 @@ const MyPostWidget = ({ picturePath }) => {
 
         {isNonMobileScreens ? (
           <>
-            {/* <FlexBetween gap="0.25rem">
-              <GifBoxOutlined sx={{ color: mediumMain }} />
-              <Typography color={mediumMain}>Clip</Typography>
-            </FlexBetween>
-
-            <FlexBetween gap="0.25rem">
-              <AttachFileOutlined sx={{ color: mediumMain }} />
-              <Typography color={mediumMain}>Attachment</Typography>
-            </FlexBetween>
-
-            <FlexBetween gap="0.25rem">
-              <MicOutlined sx={{ color: mediumMain }} />
-              <Typography color={mediumMain}>Audio</Typography>
-            </FlexBetween> */}
           </>
         ) : (
           <FlexBetween gap="0.25rem">
@@ -202,12 +188,16 @@ const MyPostWidget = ({ picturePath }) => {
         )}
         <LoadingButton
           loading={loading}
-          disabled={!post}
+          // disabled={!post}
           onClick={handlePost}
           sx={{
             color: palette?.background?.alt,
             backgroundColor: palette?.primary?.main,
             borderRadius: "3rem",
+            "&:hover": {
+              color: palette?.primary?.main,
+              backgroundColor: palette?.primary?.light
+            },
           }}
         >
           POST

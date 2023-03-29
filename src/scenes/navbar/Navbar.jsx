@@ -46,14 +46,7 @@ const Navbar = () => {
   const primaryLight = theme?.palette?.primary?.light;
   const alt = theme.palette?.background?.alt;
 
-  const fullName = `${user ? user?.firstName : "user"} ${
-    user ? user?.lastName : "name"
-  }`;
-
-  const handleMessage = () => {
-    navigate("/message");
-  };
-
+  const fullName = `${user ? user?.username : "username"}`;
   const getAllUsers = async () => {
     const { data } = await getDataAPI("/users", token);
     setUsers(data);
@@ -82,7 +75,7 @@ const Navbar = () => {
             },
           }}
         >
-          HashTags
+          HashTag
         </Typography>
 
         {/* show search bar only for mobile screens */}
@@ -129,8 +122,7 @@ const Navbar = () => {
                 {users?.length > 0 ? (
                   <Box>
                     {users.map((user1) =>
-                      user1?.firstName.toLowerCase().includes(search) |
-                        user1?.lastName.toLowerCase().includes(search) &&
+                      user1?.username.toLowerCase().includes(search) &&
                       user._id !== user1?.id ? (
                         <Link
                           key={user1?._id}
@@ -158,7 +150,7 @@ const Navbar = () => {
                                 variant="subtitle2"
                                 color={dark}
                               >
-                                {user1?.firstName} {user1?.lastName}
+                                {user1?.username}
                               </Typography>
                             </Box>
                           </Box>
@@ -186,10 +178,10 @@ const Navbar = () => {
             )}
           </IconButton>
           <Message
-            onClick={handleMessage}
+            onClick={()=>navigate("/message")}
             sx={{ fontSize: "25px", cursor: "pointer" }}
           />
-          <Notifications sx={{ fontSize: "25px" }} />
+          <Notifications  />
           <Help sx={{ fontSize: "25px" }} />
           <FormControl variant="standard" value={fullName}>
             <Select
@@ -269,8 +261,8 @@ const Navbar = () => {
                 <LightMode sx={{ color: dark, fontSize: "25px" }} />
               )}
             </IconButton>
-            <Message sx={{ fontSize: "25px" }} onClick={handleMessage} />
-            <Notifications sx={{ fontSize: "25px" }} />
+            <Message sx={{ fontSize: "25px" }} onClick={()=>navigate("/message")} />
+            <Notifications onClick={()=> navigate('/notifications')}  sx={{ fontSize: "25px" }} />
             <Help sx={{ fontSize: "25px" }} />
             <FormControl variant="standard" value={fullName}>
               <Select

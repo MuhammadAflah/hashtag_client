@@ -56,7 +56,7 @@ const ChatItem = ({ chat }) => {
           <ListItemAvatar>
             <Avatar alt={`Avatar `} src={user?.picturePath} />
           </ListItemAvatar>
-          <ListItemText primary={user?.firstName} />
+          <ListItemText primary={user?.username} />
         </ListItemButton>
       </ListItem>
       <Divider />

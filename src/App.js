@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "scenes/homePage/HomePage";
-import LoginPage from "scenes/loginPage/LoginPage";
+import LoginPage from "scenes/loginPage/Form";
 import ProfilePage from "scenes/profilePage/ProfilePage";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
@@ -12,6 +12,8 @@ import ForgotPassword from "scenes/ForgotPassword/ForgotPassword";
 import MessagePage from "scenes/MessagePage/MessagePage";
 import VerifyEmail from "scenes/VerifyEmail/VerifyEmail";
 import ResetPassword from "scenes/resetPassword/ResetPassword";
+import ErrorPage from "scenes/ErrorPage/ErrorPage";
+import RegistrationForm from "scenes/RegisterPage/Form";
 
 
 function App() {
@@ -43,8 +45,9 @@ function App() {
           <CssBaseline />
           <Routes>
             <Route path="/" element={isAuth ? <HomePage /> : <LoginPage />} />
-            <Route path="/reset-password" element = {<ResetPassword/>}/>
-            <Route path="/forgot-password" element = {<ForgotPassword/>}/>
+            <Route path="/register" element={<RegistrationForm />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route
               path="/home"
               element={isAuth ? <HomePage /> : <Navigate to="/" />}
@@ -57,7 +60,8 @@ function App() {
               path="/message"
               element={<MessagePage />}
             />
-            <Route path='/verify-email/:id' element={ <VerifyEmail/>}/>
+            <Route path='/verify-email/:id' element={<VerifyEmail />} />
+            <Route path="*" element={<ErrorPage />} />
           </Routes>
         </ThemeProvider>
       </BrowserRouter>

@@ -35,6 +35,7 @@ const PostWidget = ({
   comments,
   createdAt,
 }) => {
+  console.log(name,"user nameeeeeeeeeeeeeeeeeeee");
   const [isComments, setIsComments] = useState(false);
   const [comment, setComment] = useState("");
   const [errors, setErrors] = useState({});
@@ -54,7 +55,12 @@ const PostWidget = ({
     comment: Yup.string()
       .required("Comment is required")
       .matches(/^\S.*$/, "Field must not start with white space")
-      .max(50, "Max 50 words allowed for comment"),
+      // .max(50, "Max 50 words allowed for comment"),
+      .test(
+        "wordCount",
+        "Max 50 words allowed for comment",
+        (value) => value.trim().split(/\s+/).length <= 50
+      ),
   });
   const patchLike = async () => {
     try {
@@ -181,9 +187,7 @@ const PostWidget = ({
                     src={comment?.author?.picturePath}
                   />
                   <strong>
-                    {comment?.author?.firstName +
-                      " " +
-                      comment?.author?.lastName}{" "}
+                    {comment?.author?.username }{" "}
                   </strong>
                   <Box
                     sx={{
@@ -214,7 +218,13 @@ const PostWidget = ({
                   value={comment}
                   onChange={handleCommentChange}
                   error={Boolean(errors?.comment)}
-                  helperText={errors?.comment}
+                  // helperText={errors?.comment}
+                  helperText={
+                    errors.comment
+                      ? errors.comment
+                      : `${50 - comment.length} characters left`
+                  }
+                  inputProps={{ maxLength: 50 }}
                   fullWidth
                   maxRows={1}
                   sx={{

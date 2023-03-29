@@ -5,6 +5,9 @@ import {
   useMediaQuery,
   Typography,
   useTheme,
+  InputAdornment,
+  IconButton,
+  Divider,
 } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { Formik } from "formik";
@@ -19,63 +22,48 @@ import { postDataAPI } from "utils/fetchData";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
-
-const registerSchema = yup.object().shape({
-  firstName: yup.string().required("required"),
-  lastName: yup.string().required("required"),
-  email: yup.string().email("invalid email").required("required"),
-  password: yup
-    .string()
-    .required("required")
-    .min(8, "Password must be at least 8 characters long")
-    .max(20, "Password must be at most 20 characters long")
-    .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .matches(/[a-z]/, "Password must contain at least one lowercase letter")
-    .matches(/[0-9]/, "Password must contain at least one number")
-    .matches(
-      /[!@#$%^&*(),.?":{}|<>]/,
-      "Password must contain at least one special character"
-    ),
-
-  location: yup.string().required("required"),
-  occupation: yup.string().required("required"),
-  picture: yup.string().required("required"),
-});
+import config from "../../utils/config.js"
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { MDBCard, MDBCardBody, MDBCardImage, MDBCol, MDBContainer, MDBIcon, MDBRow } from "mdb-react-ui-kit";
 
 const loginSchema = yup.object().shape({
-  email: yup.string().email("invalid email").required("required"),
+  emailOrUsername: yup
+    .string()
+    .test(
+      "email-or-username",
+      "Please enter a valid email or username",
+      function (value) {
+        const isEmail = yup.string().email().isValidSync(value);
+        const isUsername = /^[a-z0-9_.]+$/.test(value);
+        return isEmail || isUsername;
+      }
+    )
+    .required("Email or username is required"),
   password: yup
     .string()
-    .required("required")
-    .min(8, "Password must be at least 8 characters long")
-    .max(20, "Password must be at most 20 characters long")
-    .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .matches(/[a-z]/, "Password must contain at least one lowercase letter")
-    .matches(/[0-9]/, "Password must contain at least one number")
+    .required("Password is required")
     .matches(
-      /[!@#$%^&*(),.?":{}|<>]/,
-      "Password must contain at least one special character"
+      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
+      "Password must contain at least one uppercase letter, one lowercase letter, one number, and be at least 8 characters long"
     ),
 });
 
 const initialValuesRegister = {
-  firstName: "",
-  lastName: "",
+  username: "",
   email: "",
   password: "",
-  location: "",
-  occupation: "",
   picture: "",
 };
 
-const initialValuesLogin = {
-  email: "",
+const initialValues = {
+  emailOrUsername: "",
   password: "",
 };
 
-const Form = () => {
+const LoginPage = () => {
   const [pageType, setPageType] = useState("login");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { palette } = useTheme();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -83,34 +71,6 @@ const Form = () => {
   const isLogin = pageType === "login";
   const isRegister = pageType === "register";
 
-  const register = async (values, onSubmitProps) => {
-    try {
-      const formData = new FormData();
-      for (let value in values) {
-        setLoading(true);
-        formData.append(value, values[value]);
-      }
-      formData.append("picturePath", values?.picture?.name);
-
-      const { data } = await postDataAPI(`/auth/register`, formData);
-      const savedUser = data;
-      onSubmitProps.resetForm();
-      setLoading(false);
-      if (savedUser?.status === "Pending") {
-        navigate(`/verify-email/${savedUser?.user}`);
-      }
-      // if (savedUser) setPageType("login");
-    } catch (err) {
-      setLoading(false);
-      if (err.response && err?.response?.data?.error) {
-        err?.response?.data?.error?.forEach((err) => {
-          toast.error(err, {
-            position: "bottom-center",
-          });
-        });
-      }
-    }
-  };
 
   const login = async (values, onSubmitProps) => {
     try {
@@ -139,45 +99,12 @@ const Form = () => {
     }
   };
 
-  const handleFormSubmit = async (values, onSubmitProps) => {
-    if (isLogin) await login(values, onSubmitProps);
-    if (isRegister) await register(values, onSubmitProps);
-  };
 
-  // const handleGoogleLogin = async (response) => {
-  //   const token =response.credential
-  //   console.log(token);
-  //   try {
-  //     const { data } = await postDataAPI(
-  //       `/auth/google-login`,
-  //       token
-  //     );
-  //     if (data) {
-  //       dispatch(
-  //         setLogin({
-  //           token: data.token,
-  //         })
-  //       );
-  //       dispatch(
-  //         setUserData({
-  //           user: data.user,
-  //         })
-  //       );
-  //       navigate("/home");
-  //     }
-  //   } catch (err) {
-  //     ((error) => {
-  //       toast.error(error.response.data.msg, {
-  //         position: "top-center",
-  //       });
-  //     })(err);
-  //   }
-  // };
 
   const handleGoogleLogin = async (response) => {
     const data = JSON.stringify({ token: response.credential });
     axios
-      .post(`https://hashtags.site/auth/google-login`, data, {
+    .post(`https://hashtags.site/auth/google-login`, data, {
         headers: { "Content-Type": "application/json" },
       })
       .then((response) => {
@@ -194,7 +121,7 @@ const Form = () => {
         navigate("/home");
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         ((error) => {
           toast.error(error?.response?.data?.msg, {
             position: "top-center",
@@ -205,9 +132,9 @@ const Form = () => {
 
   return (
     <Formik
-      onSubmit={handleFormSubmit}
-      initialValues={isLogin ? initialValuesLogin : initialValuesRegister}
-      validationSchema={isLogin ? loginSchema : registerSchema}
+      onSubmit={login}
+      initialValues={initialValues}
+      validationSchema={loginSchema}
     >
       {({
         values,
@@ -220,182 +147,134 @@ const Form = () => {
         resetForm,
       }) => (
         <form onSubmit={handleSubmit}>
-          <Box
-            display="grid"
-            gap="30px"
-            gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-            sx={{
-              "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-            }}
-          >
-            {isRegister && (
-              <>
-                <TextField
-                  label="First Name"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values?.firstName}
-                  name="firstName"
-                  error={
-                    Boolean(touched?.firstName) && Boolean(errors?.firstName)
-                  }
-                  helperText={touched?.firstName && errors?.firstName}
-                  sx={{ gridColumn: "span 2" }}
-                />
-                <TextField
-                  label="Last Name"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values?.lastName}
-                  name="lastName"
-                  error={Boolean(touched?.lastName) && Boolean(errors?.lastName)}
-                  helperText={touched?.lastName && errors?.lastName}
-                  sx={{ gridColumn: "span 2" }}
-                />
-                <TextField
-                  label="Location"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values?.location}
-                  name="location"
-                  error={Boolean(touched?.location) && Boolean(errors?.location)}
-                  helperText={touched?.location && errors?.location}
-                  sx={{ gridColumn: "span 4" }}
-                />
-                <TextField
-                  label="Occupation"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values?.occupation}
-                  name="occupation"
-                  error={
-                    Boolean(touched?.occupation) && Boolean(errors?.occupation)
-                  }
-                  helperText={touched?.occupation && errors?.occupation}
-                  sx={{ gridColumn: "span 4" }}
-                />
-                <Box
-                  gridColumn="span 4"
-                  border={`1px solid ${palette?.neutral?.medium}`}
-                  borderRadius="5px"
-                  p="1rem"
-                >
-                  <Dropzone
-                    acceptedFiles=".jpg,.jpeg,.png"
-                    multiple={false}
-                    onDrop={(acceptedFiles) =>
-                      setFieldValue("picture", acceptedFiles[0])
-                    }
-                  >
-                    {({ getRootProps, getInputProps }) => (
-                      <Box
-                        {...getRootProps()}
-                        border={`2px dashed ${palette?.primary?.main}`}
-                        p="1rem"
-                        sx={{ "&:hover": { cursor: "pointer" } }}
-                      >
-                        <input {...getInputProps()} />
-                        {!values?.picture ? (
-                          <p>Add Picture Here</p>
-                        ) : (
-                          <FlexBetween>
-                            <Typography>{values?.picture?.name}</Typography>
-                            <EditOutlinedIcon />
-                          </FlexBetween>
-                        )}
+          <MDBContainer className="my-5 main">
+
+            <MDBCard>
+              <MDBRow className='g-0 body'>
+
+                <MDBCol item md='6'>
+                  <MDBCardImage src='https://img.freepik.com/free-vector/login-concept-illustration_114360-739.jpg' alt="login form" className='p-5 img-fluid' style={{ objectFit: "cover", height: "100%" }} />
+                </MDBCol>
+
+                <MDBCol item md='6'>
+                  <MDBCardBody className='d-flex flex-column mt-5 d-flex align-items-centeryy'>
+
+                    <div className='d-flex flex-row mt-2'>
+                      <MDBIcon fas icon="fa-doutone fa-hashtag fa-3x me-3" style={{ color: '#ff6219' }} />
+                      {/* <Tag style={{ color: '#ff6219' }} /> */}
+
+                      <span className="h1 fw-bold mb-0">HashTag</span>
+                    </div>
+
+                    <Typography variant="h5" className="fw-normal my-4 pb-3" style={{ letterSpacing: '1px' }}>
+                      Login to your account
+                    </Typography>
+                    <Box>
+
+                      <TextField
+                        label="Email or username"
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        value={values?.emailOrUsername}
+                        name="emailOrUsername"
+                        fullWidth
+                        error={
+                          Boolean(touched?.emailOrUsername) && Boolean(errors?.emailOrUsername)
+                        }
+                        helperText={touched?.emailOrUsername && errors?.emailOrUsername}
+                        sx={{ gridColumn: "span 4" }}
+                      />
+
+                      <TextField
+                        label="Password"
+                        type={showPassword ? "text" : "password"}
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        value={values?.password}
+                        name="password"
+                        fullWidth
+                        error={Boolean(touched?.password) && Boolean(errors?.password)}
+                        helperText={touched?.password && errors?.password}
+                        sx={{ gridColumn: "span 4", mt: 3 }}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton
+                                aria-label="toggle password visibility"
+                                onClick={() => setShowPassword(!showPassword)}
+                                edge="end"
+                              >
+                                {showPassword ? <Visibility /> : <VisibilityOff />}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+
+                      <Box>
+                        <LoadingButton
+                          loading={loading}
+                          fullWidth
+                          type="submit"
+                          sx={{
+                            m: "2rem 0",
+                            p: "1rem",
+                            backgroundColor: palette?.primary?.main,
+                            color: palette?.background?.alt,
+                            "&:hover": {
+                              color: palette?.primary?.main,
+                              backgroundColor: palette?.primary?.light
+                            },
+                            color: "#FFFFFF"
+                          }}
+                        >
+                          Login
+                        </LoadingButton>
+                        <Box  sx={{display:"flex", justifyContent:"space-between", mb:3}}>
+                          <Typography >
+                            Dont have an account?{" "}
+                            <Link to="/register">
+                              Register
+                            </Link>
+                          </Typography>
+
+                          <Link to="/forgot-password">
+                            <Typography
+                              sx={{
+                                textAlign: "right",
+                                textDecoration: "underline",
+                                color: palette?.primary?.main,
+                                "&:hover": {
+                                  cursor: "pointer",
+                                  color: palette?.primary?.light,
+                                },
+                              }}
+                            >
+                              Forgot Password
+                            </Typography>
+                          </Link>
+                        </Box>
+
                       </Box>
-                    )}
-                  </Dropzone>
-                </Box>
-              </>
-            )}
 
-            <TextField
-              label="Email"
-              onBlur={handleBlur}
-              onChange={handleChange}
-              value={values?.email}
-              name="email"
-              error={Boolean(touched?.email) && Boolean(errors?.email)}
-              helperText={touched?.email && errors?.email}
-              sx={{ gridColumn: "span 4" }}
-            />
-            <TextField
-              label="Password"
-              type="password"
-              onBlur={handleBlur}
-              onChange={handleChange}
-              value={values?.password}
-              name="password"
-              error={Boolean(touched?.password) && Boolean(errors?.password)}
-              helperText={touched?.password && errors?.password}
-              sx={{ gridColumn: "span 4" }}
-            />
-          </Box>
-
-          {/* BUTTONS */}
-          <Box>
-            <LoadingButton
-              loading={loading}
-              fullWidth
-              type="submit"
-              sx={{
-                m: "2rem 0",
-                p: "1rem",
-                backgroundColor: palette?.primary?.main,
-                color: palette?.background?.alt,
-                "&:hover": { color: palette?.primary?.main },
-              }}
-            >
-              {isLogin ? "LOGIN" : "REGISTER"}
-            </LoadingButton>
-            <Typography
-              onClick={() => {
-                setPageType(isLogin ? "register" : "login");
-                resetForm();
-              }}
-              sx={{
-                textDecoration: "underline",
-                color: palette?.primary?.main,
-                "&:hover": {
-                  cursor: "pointer",
-                  color: palette?.primary?.light,
-                },
-              }}
-            >
-              {isLogin
-                ? "Don't have an account? Sign Up here."
-                : "Already have an account? Login here."}
-            </Typography>
-            {isLogin && (
-              <Link to="/forgot-password">
-                <Typography
-                  sx={{
-                    textAlign: "right",
-                    textDecoration: "underline",
-                    color: palette?.primary?.main,
-                    "&:hover": {
-                      cursor: "pointer",
-                      color: palette?.primary?.light,
-                    },
-                  }}
-                >
-                  Forgot Password
-                </Typography>
-              </Link>
-            )}
-          </Box>
-          <Box sx={{ display: "flex", justifyContent: "center" }}>
-            <GoogleLogin
-              onSuccess={(response) => {
-                handleGoogleLogin(response);
-              }}
-              shape="pill"
-              onError={() => {
-                console.log("Login Failed");
-              }}
-            />
-          </Box>
+                      <Divider />
+                      <Box sx={{ display: "flex", justifyContent: "center", mt:3}}>
+                        <GoogleLogin
+                          onSuccess={(response) => {
+                            handleGoogleLogin(response);
+                          }}
+                          shape="pill"
+                          onError={() => {
+                            console.log("Login Failed");
+                          }}
+                        />
+                      </Box>
+                    </Box>
+                  </MDBCardBody>
+                </MDBCol>
+              </MDBRow>
+            </MDBCard>
+          </MDBContainer>
           <Toaster />
         </form>
       )}
@@ -403,4 +282,4 @@ const Form = () => {
   );
 };
 
-export default Form;
+export default LoginPage;
